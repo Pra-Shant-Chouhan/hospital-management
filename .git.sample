@@ -1,0 +1,9 @@
+# Copy this file to .env in the backend folder and fill in your values.
+# Backend example:
+PORT=3000
+JWT_SECRET=your-jwt-secret
+MONGO_URI=mongodb+srv://<username>:<password>@<cluster-url>/<database-name>?retryWrites=true&w=majority
+
+# Frontend example:
+# Create a frontend/.env file with:
+# VITE_API_URL=http://localhost:3000/api
