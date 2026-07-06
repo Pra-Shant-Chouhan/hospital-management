@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
-import { getMemoryUserById } from './config/storage.js'
+import User from '../models/User.js'
 
-export const protect = (req, res, next) => {
+export const protect = async (req, res, next) => {
     const authHeader = req.headers.authorization || ''
     const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
 
@@ -11,7 +11,7 @@ export const protect = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'hospital-secret')
-        const user = getMemoryUserById(decoded.id)
+        const user = await User.findById(decoded.id).select('-password')
         if (!user) {
             return res.status(401).json({ message: 'User not found' })
         }

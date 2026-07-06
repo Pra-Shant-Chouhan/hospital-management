@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt'
-import { createMemoryUser, getMemoryUserByEmail, seedDemoData } from '../middleware/config/storage.js'
+import User from '../models/User.js'
 import { generateToken } from '../utils/generateToken.js'
 
 export const registerUser = async (req, res) => {
@@ -14,14 +14,13 @@ export const registerUser = async (req, res) => {
             return res.status(400).json({ message: 'Specialization is required for doctors' })
         }
 
-        seedDemoData()
-        const existingUser = getMemoryUserByEmail(email)
+        const existingUser = await User.findOne({ email })
         if (existingUser) {
             return res.status(400).json({ message: 'Email already exists' })
         }
 
         const hashedPassword = await bcrypt.hash(password, 10)
-        const user = createMemoryUser({
+        const user = await User.create({
             name,
             email,
             password: hashedPassword,
@@ -30,7 +29,10 @@ export const registerUser = async (req, res) => {
         })
 
         const token = generateToken(user)
-        return res.status(201).json({ token, user: { _id: user._id, name: user.name, role: user.role } })
+        return res.status(201).json({
+            token,
+            user: { _id: user._id, name: user.name, role: user.role, specialization: user.specialization },
+        })
     } catch (error) {
         return res.status(500).json({ message: error.message })
     }
@@ -43,8 +45,7 @@ export const loginUser = async (req, res) => {
             return res.status(400).json({ message: 'Email and password are required' })
         }
 
-        seedDemoData()
-        const user = getMemoryUserByEmail(email)
+        const user = await User.findOne({ email })
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials' })
         }
@@ -55,7 +56,10 @@ export const loginUser = async (req, res) => {
         }
 
         const token = generateToken(user)
-        return res.json({ token, user: { _id: user._id, name: user.name, role: user.role } })
+        return res.json({
+            token,
+            user: { _id: user._id, name: user.name, role: user.role, specialization: user.specialization },
+        })
     } catch (error) {
         return res.status(500).json({ message: error.message })
     }

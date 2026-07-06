@@ -10,29 +10,43 @@ let appointmentCounter = 1
 const demoPasswordHash = bcrypt.hashSync('123456', 10)
 
 export const seedDemoData = () => {
-    if (memoryStore.users.length > 0) {
-        return memoryStore
+    if (memoryStore.users.length === 0) {
+        memoryStore.users.push(
+            {
+                _id: `user-${userCounter++}`,
+                name: 'Dr. Alice Green',
+                email: 'alice@hospital.com',
+                password: demoPasswordHash,
+                role: 'doctor',
+                specialization: 'Cardiology',
+                createdAt: new Date(),
+            },
+            {
+                _id: `user-${userCounter++}`,
+                name: 'Bob Carter',
+                email: 'bob@hospital.com',
+                password: demoPasswordHash,
+                role: 'patient',
+                createdAt: new Date(),
+            },
+        )
     }
 
-    memoryStore.users.push(
-        {
-            _id: `user-${userCounter++}`,
-            name: 'Dr. Alice Green',
-            email: 'alice@hospital.com',
-            password: demoPasswordHash,
-            role: 'doctor',
-            specialization: 'Cardiology',
-            createdAt: new Date(),
-        },
-        {
-            _id: `user-${userCounter++}`,
-            name: 'Bob Carter',
-            email: 'bob@hospital.com',
-            password: demoPasswordHash,
-            role: 'patient',
-            createdAt: new Date(),
-        },
-    )
+    if (memoryStore.appointments.length === 0) {
+        const doctor = memoryStore.users.find((user) => user.role === 'doctor')
+        const patient = memoryStore.users.find((user) => user.role === 'patient')
+
+        if (doctor && patient) {
+            memoryStore.appointments.push({
+                _id: `appointment-${appointmentCounter++}`,
+                doctor: doctor._id,
+                patient: patient._id,
+                appointmentDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
+                status: 'Booked',
+                createdAt: new Date(),
+            })
+        }
+    }
 
     return memoryStore
 }

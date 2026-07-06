@@ -15,6 +15,7 @@ export const connectDB = async () => {
         return { connected: true, mode: 'mongo' }
     } catch (error) {
         dbMode = 'memory'
+        console.log("full error", error)
         console.error('MongoDB connection error:', error.message)
         return { connected: false, mode: 'memory', error: error.message }
     }
